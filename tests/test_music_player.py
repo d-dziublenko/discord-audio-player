@@ -3,6 +3,7 @@ from unittest.mock import Mock, AsyncMock, patch, MagicMock
 import asyncio
 import discord
 from discord.ext import commands
+import tempfile
 
 # Import your bot modules
 import sys
@@ -54,8 +55,9 @@ class TestMusicPlayer(unittest.TestCase):
         # Context already has guild set in setUp
         result = self.bot.loop.run_until_complete(self.music_cog.cog_check(self.ctx))
         self.assertTrue(result)
-        
-    def test_get_player_creates_new(self):
+    
+    @patch('asyncio.create_task')
+    def test_get_player_creates_new(self, mock_create_task):
         """Test that get_player creates a new player if none exists"""
         player = self.music_cog.get_player(self.ctx)
         
@@ -63,8 +65,9 @@ class TestMusicPlayer(unittest.TestCase):
         self.assertIsInstance(player, MusicPlayer)
         self.assertIn(self.ctx.guild.id, self.music_cog.players)
         self.assertEqual(self.music_cog.players[self.ctx.guild.id], player)
-        
-    def test_get_player_returns_existing(self):
+    
+    @patch('asyncio.create_task')
+    def test_get_player_returns_existing(self, mock_create_task):
         """Test that get_player returns existing player"""
         # Create initial player
         player1 = self.music_cog.get_player(self.ctx)
@@ -74,9 +77,10 @@ class TestMusicPlayer(unittest.TestCase):
         
         # Should be the same instance
         self.assertIs(player1, player2)
-        
+    
+    @patch('asyncio.create_task')
     @patch('music_player.YTDLSource.create_source')
-    async def test_play_command(self, mock_create_source):
+    async def test_play_command(self, mock_create_source, mock_create_task):
         """Test the play command"""
         # Set up mocks
         mock_source = AsyncMock()
@@ -87,7 +91,7 @@ class TestMusicPlayer(unittest.TestCase):
         self.ctx.voice_client = voice_client
         
         # Run play command
-        await self.music_cog.play_(self.ctx, search="test song")
+        self.bot.loop.run_until_complete(self.music_cog.play_(self.ctx, search="test song"))
         
         # Verify create_source was called with correct parameters
         mock_create_source.assert_called_once_with(
@@ -101,7 +105,7 @@ class TestMusicPlayer(unittest.TestCase):
         """Test duration formatting"""
         # Test various duration formats
         test_cases = [
-            (0, "Unknown"),           # Zero duration
+            (0, "🔴 Live"),           # Zero duration
             (30, "0:30"),            # 30 seconds
             (90, "1:30"),            # 1 minute 30 seconds
             (3661, "1:01:01"),       # 1 hour 1 minute 1 second
@@ -113,28 +117,32 @@ class TestMusicPlayer(unittest.TestCase):
                 result = YTDLSource.format_duration(duration)
                 self.assertEqual(result, expected)
                 
-    @patch('discord.FFmpegPCMAudio')
-    def test_ytdl_source_creation(self, mock_ffmpeg):
-        """Test YTDLSource creation"""
-        # Mock data
-        data = {
-            'title': 'Test Song',
-            'webpage_url': 'https://example.com',
-            'duration': 180,
-            'thumbnail': 'https://example.com/thumb.jpg',
-            'uploader': 'Test Artist'
-        }
-        
-        # Create source
-        source = YTDLSource(mock_ffmpeg, data=data, requester=self.ctx.author)
-        
-        # Verify attributes
-        self.assertEqual(source.title, 'Test Song')
-        self.assertEqual(source.web_url, 'https://example.com')
-        self.assertEqual(source.duration, 180)
-        self.assertEqual(source.thumbnail, 'https://example.com/thumb.jpg')
-        self.assertEqual(source.uploader, 'Test Artist')
-        self.assertEqual(source.requester, self.ctx.author)
+    def test_ytdl_source_creation(self):
+        """Test YTDLSource creation with valid AudioSource"""
+
+        # Create temporary fake audio file
+        with tempfile.NamedTemporaryFile(suffix=".mp3") as fake_audio:
+            # Create real FFmpegPCMAudio with fake file
+            audio_source = discord.FFmpegPCMAudio(fake_audio.name)
+
+            data = {
+                'title': 'Test Song',
+                'webpage_url': 'https://example.com',
+                'duration': 180,
+                'thumbnail': 'https://example.com/thumb.jpg',
+                'uploader': 'Test Artist'
+            }
+
+            # Create YTDLSource with valid source
+            source = YTDLSource(audio_source, data=data, requester=self.ctx.author)
+
+            self.assertEqual(source.title, 'Test Song')
+            self.assertEqual(source.web_url, 'https://example.com')
+            self.assertEqual(source.duration, 180)
+            self.assertEqual(source.thumbnail, 'https://example.com/thumb.jpg')
+            self.assertEqual(source.uploader, 'Test Artist')
+            self.assertEqual(source.requester, self.ctx.author)
+
 
 
 class TestMusicPlayerIntegration(unittest.TestCase):

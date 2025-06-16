@@ -78,6 +78,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
     """Enhanced audio source class with better error handling and metadata"""
     
     def __init__(self, source, *, data, requester):
+        self.original = source
+
         super().__init__(source)
         self.requester = requester
         
@@ -96,6 +98,12 @@ class YTDLSource(discord.PCMVolumeTransformer):
         
         # Set initial volume
         self.volume = DEFAULT_VOLUME
+
+    def __del__(self):
+        try:
+            self.cleanup()
+        except Exception:
+            pass
 
     def __getitem__(self, item: str):
         """Allows us to access attributes similar to a dict."""
