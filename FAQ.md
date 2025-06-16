@@ -4,11 +4,11 @@
 
 ### Q: Is this bot free to use?
 
-**A:** Yes! This bot is completely free and open source under the MIT license. You can host it yourself at no cost (except for any hosting fees if you choose to use a VPS).
+**A:** Yes! This bot is completely free and open source under the AGPL-3.0 license. You can host it yourself at no cost (except for any hosting fees if you choose to use a VPS).
 
 ### Q: Can I modify the bot for my server?
 
-**A:** Absolutely! The code is open source. Feel free to fork it and customize it to your needs. Just remember to comply with the MIT license.
+**A:** Absolutely! The code is open source. Feel free to fork it and customize it to your needs. Just remember to comply with the AGPL-3.0 license.
 
 ### Q: How many servers can the bot be in?
 
