@@ -170,7 +170,7 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 
 ## License 📄
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the AGPL-3.0 license - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments 🙏
 
