@@ -1,5 +1,53 @@
-discord.py
+# Core Dependencies
+# These are essential for the bot to function
 
-yt-dlp
+# Discord API wrapper - using latest stable version
+# discord.py provides the interface to Discord's API
+discord.py>=2.3.2,<3.0.0
 
-python-dotenv
+# YouTube downloader - successor to youtube-dl
+# yt-dlp extracts audio streams from YouTube and other platforms
+yt-dlp>=2023.12.30
+
+# Environment variable management
+# python-dotenv loads variables from .env files
+python-dotenv>=1.0.0,<2.0.0
+
+# Optional but Recommended Dependencies
+# Uncomment these if you want additional features
+
+# For better async support and performance
+# aiohttp>=3.9.1,<4.0.0  # Already included with discord.py
+# aiofiles>=23.2.1  # For async file operations
+
+# For advanced audio processing
+# PyNaCl>=1.5.0,<2.0.0  # For voice support (usually auto-installed)
+
+# Development Dependencies
+# Install these with: pip install -r requirements-dev.txt
+# (create a separate requirements-dev.txt file)
+
+# Testing
+# pytest>=7.4.3
+# pytest-asyncio>=0.21.1
+# pytest-cov>=4.1.0
+
+# Code quality
+# flake8>=6.1.0
+# black>=23.11.0
+# isort>=5.12.0
+
+# Type checking
+# mypy>=1.7.1
+
+# Documentation
+# sphinx>=7.2.6
+# sphinx-rtd-theme>=2.0.0
+
+# Security scanning
+# safety>=2.3.5
+# bandit>=1.7.5
+
+# Performance profiling
+# memory-profiler>=0.61.0
+# line-profiler>=4.1.1
